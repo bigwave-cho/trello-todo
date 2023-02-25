@@ -1,51 +1,68 @@
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-/*
-npm i react-beautiful-dnd
-npm i --save-dev @types/react-beautiful-dnd
-DragDropContext 
-: 기본적으로 드래그 앤 드롭을 적용하고 싶은 공간
-onDragEnd : 드래그가 끝나면 콜백함수 호출
-<Droppable> : 드롭할 수 있는 영역
-<Draggable> : 드래그 가능한 영역
+import styled from 'styled-components';
 
+const Wrapper = styled.div`
+  max-width: 480px;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+`;
 
-droppableProps : 드래그 작동해서 움직이는 영역
-dragHandle : 드래그 핸들이 작동하는 영역
-one은 전체 영역 드래거블
-two는 불 이모지만 가능해짐
-*/
-const onDragEnd = () => {};
+const Boards = styled.div`
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(1, 1fr);
+`;
+
+const Board = styled.div`
+  min-height: 200px;
+  padding: 20px 10px;
+  padding-top: 30px;
+  background-color: ${(props) => props.theme.boardColor};
+  border-radius: 5px;
+`;
+
+const Card = styled.div`
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin-bottom: 5px;
+  background-color: ${(props) => props.theme.cardColor};
+`;
+
+const toDos = ['a', 'b', 'c', 'd', 'e', 'f'];
+
 function App() {
+  const onDragEnd = () => {};
+  //magic.placeholder : 카드가 drag 될 때 빈자리 공간을 그대로 유지해줌.
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div>
-        <Droppable droppableId="one">
-          {(magic) => (
-            <ul ref={magic.innerRef} {...magic.droppableProps}>
-              <Draggable draggableId="first" index={0}>
-                {(magic) => (
-                  <li
-                    ref={magic.innerRef}
-                    {...magic.draggableProps}
-                    {...magic.dragHandleProps}
-                  >
-                    <span {...magic.dragHandleProps}>🔥</span>
-                    one
-                  </li>
-                )}
-              </Draggable>
-              <Draggable draggableId="second" index={1}>
-                {(magic) => (
-                  <li ref={magic.innerRef} {...magic.draggableProps}>
-                    <span {...magic.dragHandleProps}>🔥</span>
-                    two
-                  </li>
-                )}
-              </Draggable>
-            </ul>
-          )}
-        </Droppable>
-      </div>
+      <Wrapper>
+        <Boards>
+          <Droppable droppableId="one">
+            {(magic) => (
+              <Board ref={magic.innerRef} {...magic.droppableProps}>
+                {toDos.map((toDo, index) => (
+                  <Draggable key={toDo} draggableId={toDo} index={index}>
+                    {(magic) => (
+                      <Card
+                        ref={magic.innerRef}
+                        {...magic.draggableProps}
+                        {...magic.dragHandleProps}
+                      >
+                        {toDo}
+                      </Card>
+                    )}
+                  </Draggable>
+                ))}
+                {magic.placeholder}
+              </Board>
+            )}
+          </Droppable>
+        </Boards>
+      </Wrapper>
     </DragDropContext>
   );
 }

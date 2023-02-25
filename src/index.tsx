@@ -62,7 +62,7 @@ body {
   font-weight: 300;
   font-family: 'Source Sans Pro', sans-serif;
   background-color:${(props) => props.theme.bgColor};
-  color:${(props) => props.theme.textColor};
+  color:black;
   line-height: 1.2;
 }
 a {
@@ -75,12 +75,12 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
-  <React.StrictMode>
-    <RecoilRoot>
-      <ThemeProvider theme={darkTheme}>
-        <GlobalStyle />
-        <App />
-      </ThemeProvider>
-    </RecoilRoot>
-  </React.StrictMode>
+  // <React.StrictMode> dnd적용 안돼서 풀어놓음
+  <RecoilRoot>
+    <ThemeProvider theme={darkTheme}>
+      <GlobalStyle />
+      <App />
+    </ThemeProvider>
+  </RecoilRoot>
+  // </React.StrictMode>
 );

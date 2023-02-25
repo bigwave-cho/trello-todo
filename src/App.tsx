@@ -1,48 +1,52 @@
-import React from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { hourSelector, minutesState } from './atoms';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+/*
+npm i react-beautiful-dnd
+npm i --save-dev @types/react-beautiful-dnd
+DragDropContext 
+: 기본적으로 드래그 앤 드롭을 적용하고 싶은 공간
+onDragEnd : 드래그가 끝나면 콜백함수 호출
+<Droppable> : 드롭할 수 있는 영역
+<Draggable> : 드래그 가능한 영역
 
+
+droppableProps : 드래그 작동해서 움직이는 영역
+dragHandle : 드래그 핸들이 작동하는 영역
+one은 전체 영역 드래거블
+two는 불 이모지만 가능해짐
+*/
+const onDragEnd = () => {};
 function App() {
-  /*
-  selector를 이용해서 state를 원하는대로
-  걸러 받을 수도 있고 역으로 state를 수정도 가능하다.
-
-  useRecoilState의 state
-  atom : atom value
-  selecor : get함수의 값
-  
-  두번째 요소
-  atom : atom 수정함수
-  selector : set 함수 실행
-  */
-  const [minutes, setMinutes] = useRecoilState(minutesState);
-  const [hours, setHours] = useRecoilState(hourSelector);
-
-  const onMinutesChange = (event: React.FormEvent<HTMLInputElement>) => {
-    setMinutes(+event.currentTarget.value);
-  };
-
-  const onHoursChange = (event: React.FormEvent<HTMLInputElement>) => {
-    setHours(+event.currentTarget.value);
-  };
-
   return (
-    <>
-      <div className="App">
-        <input
-          value={minutes}
-          onChange={onMinutesChange}
-          type="number"
-          placeholder="Minutes"
-        />
-        <input
-          value={hours}
-          onChange={onHoursChange}
-          type="number"
-          placeholder="Hours"
-        />
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div>
+        <Droppable droppableId="one">
+          {(magic) => (
+            <ul ref={magic.innerRef} {...magic.droppableProps}>
+              <Draggable draggableId="first" index={0}>
+                {(magic) => (
+                  <li
+                    ref={magic.innerRef}
+                    {...magic.draggableProps}
+                    {...magic.dragHandleProps}
+                  >
+                    <span {...magic.dragHandleProps}>🔥</span>
+                    one
+                  </li>
+                )}
+              </Draggable>
+              <Draggable draggableId="second" index={1}>
+                {(magic) => (
+                  <li ref={magic.innerRef} {...magic.draggableProps}>
+                    <span {...magic.dragHandleProps}>🔥</span>
+                    two
+                  </li>
+                )}
+              </Draggable>
+            </ul>
+          )}
+        </Droppable>
       </div>
-    </>
+    </DragDropContext>
   );
 }
 

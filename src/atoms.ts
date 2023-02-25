@@ -12,8 +12,6 @@ export const hourSelector = selector<number>({
     return minutes / 60;
   },
   set: ({ set }, newValue) => {
-    //minutesState를 10으로 만들겠다
-    // set(minutesState,10)
     const minutes = +newValue * 60;
     set(minutesState, minutes);
   },

@@ -15,9 +15,8 @@ interface IDraggableCardProps {
 }
 
 function DraggableCard({ toDo, index }: IDraggableCardProps) {
-  //현재 상태 Component의 상태가 변하면 해당 컴포넌트의 모든 children은 리렌더링
-  console.log(toDo, 'has been rendered');
   return (
+    // dnd에서 draggableId와 key는 일치해야 함.
     <Draggable key={toDo} draggableId={toDo} index={index}>
       {(magic) => (
         <Card
@@ -31,6 +30,5 @@ function DraggableCard({ toDo, index }: IDraggableCardProps) {
     </Draggable>
   );
 }
-// React.memo : 부모 상태가 변경되어도 자식이 받는 prop이나 state가 변경되지 않았다면
-// 해당 자식 컴포넌트는 리렌더링 하지 않음.
+
 export default React.memo(DraggableCard);

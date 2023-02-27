@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
-import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
-import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from 'react-beautiful-dnd';
+import { useForm } from 'react-hook-form';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 import { toDoState } from './atoms';
@@ -15,7 +20,6 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   margin: 0 auto;
-  /* background-color: black; */
 `;
 
 const CreateBoard = styled.button`
@@ -49,47 +53,85 @@ const Boards = styled.div`
   align-items: flex-start;
   width: 100%;
   gap: 10px;
+  background-color: black;
 `;
 
 function App() {
-  const [toDos, setToDos] = useRecoilState(toDoState);
+  const [boards, setBoards] = useRecoilState(toDoState);
 
   const onDragEnd = (info: DropResult) => {
     const { destination, source } = info;
     if (!destination) return;
-    // if (destination?.droppableId === source.droppableId) {
-    //   setToDos((allBoards) => {
-    //     const boardCopy = [...allBoards[source.droppableId]];
-    //     const taskObj = boardCopy[source.index];
-    //     boardCopy.splice(source.index, 1);
-    //     boardCopy.splice(destination?.index, 0, taskObj);
-    //     return {
-    //       ...allBoards,
-    //       [source.droppableId]: boardCopy,
-    //     };
-    //   });
-    // }
-    // if (destination?.droppableId !== source.droppableId) {
-    //   setToDos((allBoards) => {
-    //     const sourceBoard = [...allBoards[source.droppableId]];
-    //     const taskObj = sourceBoard[source.index];
-    //     const destinationBoard = [...allBoards[destination?.droppableId]];
-    //     sourceBoard.splice(source.index, 1);
-    //     destinationBoard.splice(destination!.index, 0, taskObj);
-    //     return {
-    //       ...allBoards,
-    //       [source.droppableId]: sourceBoard,
-    //       [destination?.droppableId]: destinationBoard,
-    //     };
-    //   });
+
+    if (source.droppableId === 'boards') {
+      if (destination.index === source.index) return;
+      if (destination.index !== source.index) {
+        setBoards((prev) => {
+          const boardsCopy = [...prev];
+          const taskBoard = boardsCopy[+source.index];
+          boardsCopy.splice(+source.index, 1);
+          boardsCopy.splice(+destination.index, 0, taskBoard);
+          console.log(boardsCopy);
+          return boardsCopy;
+        });
+      }
+    }
+    if (destination?.droppableId === source.droppableId) {
+      setBoards((allBoards) => {
+        const boardsCopy = [...allBoards];
+        const boardIndex = boardsCopy.findIndex(
+          (board) => board.id + '' === source.droppableId.split('-')[1]
+        );
+        const boardCopy = { ...boardsCopy[boardIndex] };
+        const listCopy = [...boardCopy.toDos];
+        const targetToDo = boardCopy.toDos[source.index];
+
+        listCopy.splice(source.index, 1);
+        listCopy.splice(destination.index, 0, targetToDo);
+
+        boardCopy.toDos = listCopy;
+        boardsCopy.splice(boardIndex, 1, boardCopy);
+
+        return boardsCopy;
+      });
+    }
+    if (destination?.droppableId !== source.droppableId) {
+      setBoards((allBoards) => {
+        const allBoardsCopy = [...allBoards];
+        const sourceBoardIndex = allBoardsCopy.findIndex(
+          (board) => board.id + '' === source.droppableId.split('-')[1]
+        );
+        const destiBoardIndex = allBoardsCopy.findIndex(
+          (board) => board.id + '' === destination.droppableId.split('-')[1]
+        );
+
+        const sourceBoardCopy = { ...allBoardsCopy[sourceBoardIndex] };
+        const destinationBoardCopy = { ...allBoardsCopy[destiBoardIndex] };
+
+        const sourceToDosCopy = [...sourceBoardCopy.toDos];
+        const destinationToDosCopy = [...destinationBoardCopy.toDos];
+
+        const targetToDo = sourceBoardCopy.toDos[source.index];
+
+        sourceToDosCopy.splice(source.index, 1);
+        destinationToDosCopy.splice(destination.index, 0, targetToDo);
+
+        sourceBoardCopy.toDos = sourceToDosCopy;
+        destinationBoardCopy.toDos = destinationToDosCopy;
+
+        allBoardsCopy.splice(sourceBoardIndex, 1, sourceBoardCopy);
+        allBoardsCopy.splice(destiBoardIndex, 1, destinationBoardCopy);
+
+        return allBoardsCopy;
+      });
+    }
   };
 
   useEffect(() => {
-    // localStorage.setItem('toDos', JSON.stringify(toDos));
-  }, []);
+    localStorage.setItem('toDos', JSON.stringify(boards));
+  }, [boards]);
   const [isBoardOpen, setIsBoardOpen] = useState(false);
   const { register, handleSubmit, setValue } = useForm<IBoardForm>();
-  const [board, setBoard] = useRecoilState(toDoState);
   const onClick = () => {
     setIsBoardOpen((prev) => !prev);
   };
@@ -100,10 +142,9 @@ function App() {
 
   const onValid = ({ board }: IBoardForm) => {
     const newBoard = { title: board, id: Date.now(), toDos: [] };
-    setBoard((prev) => [...prev, newBoard]);
+    setBoards((prev) => [...prev, newBoard]);
     setValue('board', '');
   };
-  console.log(board);
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Wrapper>
@@ -123,18 +164,28 @@ function App() {
             </CreateBoard>
           )}
         </div>
-        <Droppable droppableId={`boards`}>
+        <Droppable droppableId={`boards`} direction="horizontal" type="BOARDS">
           {(provided) => (
             <Boards ref={provided.innerRef} {...provided.droppableProps}>
-              {toDos.map((toDo) => {
+              {boards.map((board, index) => {
                 return (
-                  <Board
-                    boardId={toDo.title}
-                    key={toDo.title}
-                    toDos={toDo.toDos}
-                  />
+                  <Draggable
+                    draggableId={`board-${board.id}`}
+                    key={board.id}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <Board
+                        parentMagic={provided}
+                        boardTitle={board.title}
+                        boardId={board.id + ''}
+                        toDos={board.toDos}
+                      />
+                    )}
+                  </Draggable>
                 );
               })}
+              {provided.placeholder}
             </Boards>
           )}
         </Droppable>

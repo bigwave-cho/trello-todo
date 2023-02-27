@@ -1,4 +1,5 @@
-import { Droppable } from 'react-beautiful-dnd';
+import React from 'react';
+import { Draggable, DraggableProvided, Droppable } from 'react-beautiful-dnd';
 import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -51,16 +52,17 @@ const Form = styled.form`
 interface IBoardProps {
   toDos: IToDo[];
   boardId: string;
+  boardTitle: string;
+  parentMagic: DraggableProvided;
 }
 
 interface IForm {
   toDo: string;
 }
 
-function Board({ toDos, boardId }: IBoardProps) {
+function Board({ toDos, boardId, boardTitle, parentMagic }: IBoardProps) {
   const { register, handleSubmit, setValue } = useForm<IForm>();
   const setToDos = useSetRecoilState(toDoState);
-
   const onValid = ({ toDo }: IForm) => {
     const newToDo = {
       id: Date.now(),
@@ -74,9 +76,10 @@ function Board({ toDos, boardId }: IBoardProps) {
     // });
     setValue('toDo', '');
   };
+  console.log(boardId);
   return (
-    <Wrapper>
-      <Title>{boardId}</Title>
+    <Wrapper ref={parentMagic.innerRef} {...parentMagic.draggableProps}>
+      <Title {...parentMagic.dragHandleProps}>{boardTitle}</Title>
       <Form onSubmit={handleSubmit(onValid)}>
         <input
           {...register('toDo', { required: true })}
@@ -84,7 +87,7 @@ function Board({ toDos, boardId }: IBoardProps) {
           placeholder={`Add task on ${boardId}`}
         />
       </Form>
-      <Droppable droppableId={boardId}>
+      <Droppable droppableId={`todos-${boardId}`}>
         {(magic, snapshot) => {
           return (
             <Area
@@ -109,4 +112,4 @@ function Board({ toDos, boardId }: IBoardProps) {
     </Wrapper>
   );
 }
-export default Board;
+export default React.memo(Board);

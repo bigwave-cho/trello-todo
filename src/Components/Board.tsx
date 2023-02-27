@@ -1,5 +1,5 @@
 import React from 'react';
-import { Draggable, DraggableProvided, Droppable } from 'react-beautiful-dnd';
+import { DraggableProvided, Droppable } from 'react-beautiful-dnd';
 import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -68,15 +68,15 @@ function Board({ toDos, boardId, boardTitle, parentMagic }: IBoardProps) {
       id: Date.now(),
       text: toDo,
     };
-    // setToDos((allBoards) => {
-    //   return {
-    //     ...allBoards,
-    //     [boardId]: [...allBoards[boardId], newToDo],
-    //   };
-    // });
+    setToDos((allBoards) => {
+      const boardsCopy = [...allBoards];
+      const boardCopy = { ...allBoards[+boardId] };
+      const newToDoArr = [...boardCopy.toDos, newToDo];
+      boardsCopy.splice(+boardId, 1, { ...boardCopy, toDos: newToDoArr });
+      return boardsCopy;
+    });
     setValue('toDo', '');
   };
-  console.log(boardId);
   return (
     <Wrapper ref={parentMagic.innerRef} {...parentMagic.draggableProps}>
       <Title {...parentMagic.dragHandleProps}>{boardTitle}</Title>
@@ -84,7 +84,7 @@ function Board({ toDos, boardId, boardTitle, parentMagic }: IBoardProps) {
         <input
           {...register('toDo', { required: true })}
           type={'text'}
-          placeholder={`Add task on ${boardId}`}
+          placeholder={`Add task on ${boardTitle}`}
         />
       </Form>
       <Droppable droppableId={`todos-${boardId}`}>
@@ -98,6 +98,7 @@ function Board({ toDos, boardId, boardTitle, parentMagic }: IBoardProps) {
             >
               {toDos.map((toDo, index) => (
                 <DragabbleCard
+                  boardId={boardId}
                   key={toDo.id}
                   index={index}
                   toDoId={toDo.id}

@@ -1,5 +1,12 @@
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from 'react-beautiful-dnd';
+import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
+import { toDoState } from './atoms';
 
 const Wrapper = styled.div`
   max-width: 480px;
@@ -32,11 +39,34 @@ const Card = styled.div`
   background-color: ${(props) => props.theme.cardColor};
 `;
 
-const toDos = ['a', 'b', 'c', 'd', 'e', 'f'];
-
 function App() {
-  const onDragEnd = () => {};
-  //magic.placeholder : 카드가 drag 될 때 빈자리 공간을 그대로 유지해줌.
+  const [toDos, setToDos] = useRecoilState(toDoState);
+
+  const onDragEnd = ({ draggableId, destination, source }: DropResult) => {
+    // console.log(args); //dnd가 전달하는 인자의 destination과 source(출발지)를 잘 보고 사용
+    // 순서 바꾸기 로직
+    /*
+    const x = ['a', 'b', 'c', 'd', 'e', 'f'];
+    const result = x.splice(0, 1);
+    console.log(result) //["a"]
+    x.splice(2,0,result[0]);
+    console.log(x) //["b", "c", "a", "d", "e", "f"]
+    */
+    /*
+    ## Mutation(원본 변형)
+    ### non-mutation
+    const name ="messi";
+    name.toUpperCase(); // MESSI
+    console.log(name) // messi
+    */
+    if (!destination) return;
+    setToDos((oldToDos) => {
+      const copyToDos = [...oldToDos];
+      copyToDos.splice(source.index, 1);
+      copyToDos.splice(destination?.index, 0, draggableId);
+      return copyToDos;
+    });
+  };
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Wrapper>
@@ -45,6 +75,7 @@ function App() {
             {(magic) => (
               <Board ref={magic.innerRef} {...magic.droppableProps}>
                 {toDos.map((toDo, index) => (
+                  // dnd에서 draggableId와 key는 일치해야 함.
                   <Draggable key={toDo} draggableId={toDo} index={index}>
                     {(magic) => (
                       <Card

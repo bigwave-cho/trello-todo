@@ -5,19 +5,17 @@ export interface IToDo {
   text: string;
 }
 
-interface IToDoState {
-  //중요!! atom state 확장성을 주기 위해 타입스크립트 사용
-  [key: string]: IToDo[];
+export interface IBoard {
+  id: number;
+  title: string;
+  toDos: IToDo[];
 }
 
-export const toDoState = atom<IToDoState>({
+export const toDoState = atom<IBoard[]>({
   key: 'toDo',
-  default: {
-    'To Do': [
-      { id: 1, text: 'hello' },
-      { id: 2, text: 'hi' },
-    ],
-    doing: [],
-    done: [],
-  },
+  default: JSON.parse(localStorage.getItem('toDos')!) ?? [
+    { title: 'TO DO', id: 0, toDos: [{ id: 0, text: 1 }] },
+    { title: 'DOING', id: 1, toDos: [] },
+    { title: 'DONE', id: 2, toDos: [] },
+  ],
 });

@@ -22,7 +22,7 @@ const Wrapper = styled.div`
   margin: 0 auto;
 `;
 
-const CreateBoard = styled.button`
+const CreateBoard = styled.div`
   display: flex;
   background-color: bisque;
   padding: 15px 20px;
@@ -71,7 +71,6 @@ function App() {
           const taskBoard = boardsCopy[+source.index];
           boardsCopy.splice(+source.index, 1);
           boardsCopy.splice(+destination.index, 0, taskBoard);
-          console.log(boardsCopy);
           return boardsCopy;
         });
       }
@@ -176,6 +175,7 @@ function App() {
                   >
                     {(provided) => (
                       <Board
+                        index={index}
                         parentMagic={provided}
                         boardTitle={board.title}
                         boardId={board.id + ''}

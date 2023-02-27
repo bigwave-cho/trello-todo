@@ -22,7 +22,6 @@ interface IDraggableCardProps {
 
 function DraggableCard({ toDo, index }: IDraggableCardProps) {
   return (
-    // dnd에서 draggableId와 key는 일치해야 함.
     <Draggable key={toDo} draggableId={toDo} index={index}>
       {(magic, snapshot) => (
         <Card

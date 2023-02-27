@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import DragabbleCard from './DragabbleCard';
@@ -43,9 +44,23 @@ interface IBoardProps {
 }
 
 function Board({ toDos, boardId }: IBoardProps) {
+  /*
+ref : react 코드를 통해 html 엘리먼트를 지정하고 가져올 수 있는 수단
+dnd 또한 ref를 통해 해당 요소에 접근하여 스타일을 drag style 등을 부여하고 있는 것.
+*/
+  //예시.
+  const inputRef = useRef<HTMLInputElement>(null);
+  const onClick = () => {
+    inputRef.current?.focus();
+    setTimeout(() => {
+      inputRef.current?.blur();
+    }, 5000);
+  };
   return (
     <Wrapper>
       <Title>{boardId}</Title>
+      <input ref={inputRef} placeholder="grab me" />
+      <button onClick={onClick}>click me</button>
       <Droppable droppableId={boardId}>
         {(magic, snapshot) => {
           return (

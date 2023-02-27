@@ -1,6 +1,7 @@
-import { useRef } from 'react';
 import { Droppable } from 'react-beautiful-dnd';
+import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
+import { IToDo } from '../atoms';
 import DragabbleCard from './DragabbleCard';
 
 const Wrapper = styled.div`
@@ -38,29 +39,38 @@ const Area = styled.div<IAreaProps>`
   padding: 20px;
 `;
 
+const Form = styled.form`
+  width: 100%;
+
+  input {
+    width: 100%;
+  }
+`;
+
 interface IBoardProps {
-  toDos: string[];
+  toDos: IToDo[];
   boardId: string;
 }
 
+interface IForm {
+  toDo: string;
+}
+
 function Board({ toDos, boardId }: IBoardProps) {
-  /*
-ref : react 코드를 통해 html 엘리먼트를 지정하고 가져올 수 있는 수단
-dnd 또한 ref를 통해 해당 요소에 접근하여 스타일을 drag style 등을 부여하고 있는 것.
-*/
-  //예시.
-  const inputRef = useRef<HTMLInputElement>(null);
-  const onClick = () => {
-    inputRef.current?.focus();
-    setTimeout(() => {
-      inputRef.current?.blur();
-    }, 5000);
+  const { register, handleSubmit, setValue } = useForm<IForm>();
+  const onValid = ({ toDo }: IForm) => {
+    setValue('toDo', '');
   };
   return (
     <Wrapper>
       <Title>{boardId}</Title>
-      <input ref={inputRef} placeholder="grab me" />
-      <button onClick={onClick}>click me</button>
+      <Form onSubmit={handleSubmit(onValid)}>
+        <input
+          {...register('toDo', { required: true })}
+          type={'text'}
+          placeholder={`Add task on ${boardId}`}
+        />
+      </Form>
       <Droppable droppableId={boardId}>
         {(magic, snapshot) => {
           return (
@@ -71,7 +81,12 @@ dnd 또한 ref를 통해 해당 요소에 접근하여 스타일을 drag style �
               {...magic.droppableProps}
             >
               {toDos.map((toDo, index) => (
-                <DragabbleCard key={toDo} index={index} toDo={toDo} />
+                <DragabbleCard
+                  key={toDo.id}
+                  index={index}
+                  toDoId={toDo.id}
+                  toDoText={toDo.text}
+                />
               ))}
               {magic.placeholder}
             </Area>

@@ -61,6 +61,7 @@ table {
 body {
   font-weight: 300;
   font-family: 'Source Sans Pro', sans-serif;
+  background-image: url("https://plus.unsplash.com/premium_photo-1672264150574-4761d2dc3e26?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2670&q=80");
   background-color:${(props) => props.theme.bgColor};
   color:black;
   line-height: 1.2;

@@ -1,10 +1,5 @@
 import { useEffect, useState } from 'react';
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import { useForm } from 'react-hook-form';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
@@ -12,7 +7,7 @@ import { toDoState } from './atoms';
 import Board from './Components/Board';
 
 const Wrapper = styled.div`
-  max-width: 680px;
+  max-width: 1280px;
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -22,13 +17,24 @@ const Wrapper = styled.div`
   margin: 0 auto;
 `;
 
-const CreateBoard = styled.div`
+interface ICreateBoardProps {
+  isBoardOpen: boolean;
+}
+
+const CreateBoard = styled.div<ICreateBoardProps>`
   display: flex;
-  background-color: bisque;
+  background-color: #dadfe9;
   padding: 15px 20px;
   margin-bottom: 20px;
   border-radius: 10px;
   color: black;
+  font-weight: 600;
+  transition: all 0.3s ease-in;
+
+  &:hover {
+    opacity: ${(props) => (props.isBoardOpen ? 1 : 0.8)};
+    cursor: pointer;
+  }
 
   input {
     width: 300px;
@@ -44,20 +50,29 @@ const CreateBoard = styled.div`
     background-color: white;
     border: none;
     border-radius: 10px;
+    cursor: pointer;
   }
 `;
 
-const Boards = styled.div`
+interface IBoardsProps {
+  isDraggingFromThis: boolean;
+}
+
+const Boards = styled.div<IBoardsProps>`
   display: flex;
   justify-content: center;
   align-items: flex-start;
   width: 100%;
   gap: 10px;
-  background-color: black;
+  transition: all 0.3s ease-in;
+  background-color: ${(props) =>
+    props.isDraggingFromThis ? 'rgba(0, 0, 0, 0.3)' : 'transparent'};
 `;
 
 function App() {
   const [boards, setBoards] = useRecoilState(toDoState);
+  const [isBoardOpen, setIsBoardOpen] = useState(false);
+  const { register, handleSubmit, setValue } = useForm<IBoardForm>();
 
   const onDragEnd = (info: DropResult) => {
     const { destination, source } = info;
@@ -82,14 +97,17 @@ function App() {
           (board) => board.id + '' === source.droppableId.split('-')[1]
         );
         const boardCopy = { ...boardsCopy[boardIndex] };
-        const listCopy = [...boardCopy.toDos];
-        const targetToDo = boardCopy.toDos[source.index];
+        const listCopy = boardCopy?.toDos?.length ? [...boardCopy.toDos] : [];
 
-        listCopy.splice(source.index, 1);
-        listCopy.splice(destination.index, 0, targetToDo);
+        if (boardCopy?.toDos?.length) {
+          const targetToDo = boardCopy.toDos[source.index];
 
-        boardCopy.toDos = listCopy;
-        boardsCopy.splice(boardIndex, 1, boardCopy);
+          listCopy.splice(source.index, 1);
+          listCopy.splice(destination.index, 0, targetToDo);
+
+          boardCopy.toDos = listCopy;
+          boardsCopy.splice(boardIndex, 1, boardCopy);
+        }
 
         return boardsCopy;
       });
@@ -106,7 +124,6 @@ function App() {
 
         const sourceBoardCopy = { ...allBoardsCopy[sourceBoardIndex] };
         const destinationBoardCopy = { ...allBoardsCopy[destiBoardIndex] };
-
         const sourceToDosCopy = [...sourceBoardCopy.toDos];
         const destinationToDosCopy = [...destinationBoardCopy.toDos];
 
@@ -129,8 +146,7 @@ function App() {
   useEffect(() => {
     localStorage.setItem('toDos', JSON.stringify(boards));
   }, [boards]);
-  const [isBoardOpen, setIsBoardOpen] = useState(false);
-  const { register, handleSubmit, setValue } = useForm<IBoardForm>();
+
   const onClick = () => {
     setIsBoardOpen((prev) => !prev);
   };
@@ -144,14 +160,17 @@ function App() {
     setBoards((prev) => [...prev, newBoard]);
     setValue('board', '');
   };
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Wrapper>
         <div>
           {!isBoardOpen ? (
-            <CreateBoard onClick={onClick}>보드 추가</CreateBoard>
+            <CreateBoard isBoardOpen={isBoardOpen} onClick={onClick}>
+              보드 추가
+            </CreateBoard>
           ) : (
-            <CreateBoard>
+            <CreateBoard isBoardOpen={isBoardOpen}>
               <form onSubmit={handleSubmit(onValid)}>
                 <input
                   {...register('board', { required: true })}
@@ -164,25 +183,21 @@ function App() {
           )}
         </div>
         <Droppable droppableId={`boards`} direction="horizontal" type="BOARDS">
-          {(provided) => (
-            <Boards ref={provided.innerRef} {...provided.droppableProps}>
+          {(provided, snapshot) => (
+            <Boards
+              isDraggingFromThis={Boolean(snapshot.draggingFromThisWith)}
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+            >
               {boards.map((board, index) => {
                 return (
-                  <Draggable
-                    draggableId={`board-${board.id}`}
-                    key={board.id}
+                  <Board
+                    key={index}
                     index={index}
-                  >
-                    {(provided) => (
-                      <Board
-                        index={index}
-                        parentMagic={provided}
-                        boardTitle={board.title}
-                        boardId={board.id + ''}
-                        toDos={board.toDos}
-                      />
-                    )}
-                  </Draggable>
+                    boardTitle={board.title}
+                    boardId={board.id + ''}
+                    toDos={board.toDos}
+                  />
                 );
               })}
               {provided.placeholder}

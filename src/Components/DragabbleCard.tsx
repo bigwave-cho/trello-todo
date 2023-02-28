@@ -12,11 +12,13 @@ const Card = styled.div<{ isDragging: boolean }>`
   margin-bottom: 5px;
   background-color: ${(props) =>
     props.isDragging ? '#74b9ff' : props.theme.cardColor};
-
   box-shadow: ${(props) =>
     props.isDragging ? '0px 2px 5px rgba(0,0,0,0.05)' : 'none'};
-
   transition: background-color 0.3s ease-in-out;
+
+  span {
+    font-weight: 600;
+  }
 `;
 
 interface IDraggableCardProps {
@@ -57,7 +59,7 @@ function DraggableCard({
           {...magic.draggableProps}
           {...magic.dragHandleProps}
         >
-          {toDoText}
+          <span>{toDoText}</span>
           <button onClick={onDelete}>X</button>
         </Card>
       )}

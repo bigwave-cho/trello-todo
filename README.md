@@ -1,46 +1,70 @@
-# Getting Started with Create React App
+# Trello-todo (with React-beautiful-dnd)
+ <img width="1208" alt="스크린샷 2023-03-20 14 12 47" src="https://user-images.githubusercontent.com/105909665/226252323-544fdb66-c021-42e5-b9b1-355f93ebd963.png">
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 프로젝트 소개
 
-## Available Scripts
+- 기존의 text와 버튼만으로 작동하는 투두리스트가 아닌 좀 더 다이내믹한 UI를 가진 앱을 만들어보고 싶었습니다.
+- 그러던 중 Beautiful D&D 라이브러리를 알게 되었고 기초적인 사용법을 습득 후 카테고리 보드 간 이동 등을 심화 적용 시켜봤습니다.
 
-In the project directory, you can run:
 
-### `npm start`
+### 🗓 수행 기간
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+> 2023.02.25 - 2022.03.01
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### 📢 배포 링크
 
-### `npm test`
+> https://bigwave-cho.github.io/trello-todo/
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 실행방법
+- npm i
+- npm start
 
-### `npm run build`
+목차
+- [기술 스택](#기술-스택)
+- [구현 기능](#구현-기능)
+- [총평](#총평)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+<br>
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 기술 스택
+<div>
+ <img src="https://img.shields.io/badge/react-61DAFB?style=for-the-badge&logo=react&logoColor=black" /> 
+ <img src="https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white" />
+ </div>
+ </br>
+ 
+ > STYLE
+ <div>
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
+ <img src="https://img.shields.io/badge/styled--components-DB7093?style=for-the-badge&logo=styled-components&logoColor=white" />
+ </div>
+</br> 
+ > Library 
+</br> 
+ <a href="https://www.npmjs.com/package/react-beautiful-dnd">React Beautiful dnd</a>
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+<br>
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## 구현 기능
+![trello](https://user-images.githubusercontent.com/105909665/226241700-cc93f3dd-84ba-4571-93c7-dc8de2adb59c.gif)
 
-## Learn More
+- state는 전역상태관리 Recoil을 이용하여 관리하였습니다.
+- 또한 state를 Local Storage에 저장하여 브라우저를 종료했다 돌아온 후에도 리스트를 유지 가능합니다.
+- 투두 리스트 순서, 카테고리 간 이동, 카테고리 보드 순서 이동 등이 가능하도록 구현하였습니다.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+
+<br>
+
+## 총평
+
+- 리코일, 리덕스 등의 핵심 라이브러리 외에 이렇게 Drag & Drop 이라는 특정 기능을 위한 라이브러리를 처음 사용해보았습니다.
+- 라이브러리라고 마냥 적용이 쉬울 줄 알았는데 제대로 사용하려면 학습이 필요함을 절실히 느꼈습니다.
+
+<br>
+
+
+
